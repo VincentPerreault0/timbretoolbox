@@ -1,9 +1,0 @@
-function [d] = c2xDistr_FGetDefaultConfig()
-d.i_SizeX		= 0;								% size of x-dim (cols)
-d.i_SizeY		= 0;								% size of y-dim (rows)
-d.f_SupX_v		= [1:d.i_SizeX];					% row vector for x-dim
-d.f_SupY_v		= [1:d.i_SizeY]';					% column vector for y-dim
-d.f_SampRateX	= 0;								% sampling rate on x-dim (hop rate)
-d.f_SampRateY	= 0;								% sampling rate on y-dim (fft rate)
-d.f_DistrPts_m	= zeros( d.i_SizeY, d.i_SizeX );	% distr points
-d.f_ENBW        = 0;
