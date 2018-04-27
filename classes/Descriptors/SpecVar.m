@@ -1,25 +1,30 @@
 classdef SpecVar < TVDescr
+    %SPECVAR Class for the spectro-temporal variation descriptor.
     
     properties (GetAccess = public, SetAccess = protected)
-        tSupport    % All Descr classes have a temporal support vector that
-        % indicates at what times the data refers to (in
-        % samples).
-        value
-        rep
+        rep         % Representation object of which it is a descriptor.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value of the descriptor (descriptor dimension
+                    %   by length(tSupport) matrix).
     end
     
     properties (Constant)
         yLabel = 'Spectro-temporal Variation';
+        % y-Label of the descriptor when it is plotted.
         repType = 'GenTimeFreqDistr';
+        % Class of the representation or abstract class of the
+        %   representation type of which it can be a descriptor.
         descrFamilyLeader = '';
+        % Name of the class of the descriptor that evaluates its value. If
+        %   empty, the descriptor evaluates its own value.
     end
     
     methods
         function specVar = SpecVar(gtfDistr, varargin)
-            % varargin is an (optional) configuration structure containing
-            % the (optional) fields below :
-            % 
-            % Threshold
+            %CONSTRUCTOR From the representation, the descriptor is
+            %evaluated.
+            
             specVar = specVar@TVDescr(gtfDistr);
             
             specVar.tSupport = 0.5*(gtfDistr.tSupport(1:end-1) + gtfDistr.tSupport(2:end));
@@ -43,6 +48,9 @@ classdef SpecVar < TVDescr
         end
         
         function sameConfig = HasSameConfig(descr, config)
+            %HASSAMECONFIG Checks if the descriptor has the same
+            %configuration as the given configuration structure.
+            
             sameConfig = true;
         end
     end

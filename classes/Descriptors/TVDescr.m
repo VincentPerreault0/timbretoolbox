@@ -1,31 +1,44 @@
 classdef (Abstract) TVDescr < Descr
-    % An abstract class for time-varying descriptors.
+    %TVDESCR Abstract class for all time-varying descriptors.
     
     properties (Abstract, GetAccess = public, SetAccess = protected)
-        tSupport    % All Descr classes have a temporal support vector that
-        % indicates at what times the data refers to (in
-        % seconds).
-        value
-        rep
+        rep         % Representation object of which it is a descriptor.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value of the descriptor (descriptor dimension
+                    %   by length(tSupport) matrix).
     end
     
     properties (Abstract, Constant)
-        yLabel
-        repType
-        descrFamilyLeader
+        repType     % Class of the representation or abstract class of the
+                    %   representation type of which it can be a
+                    %   descriptor.
+        descrFamilyLeader   % Name of the class of the descriptor that
+                            %   evaluates its value. If empty, the
+                            %   descriptor evaluates its own value.
+        yLabel      % y-Label of the descriptor when it is plotted.
     end
     properties (Constant)
         exceptions = {'exceptions', 'yLabel', 'repType', 'descrFamilyLeader'}
+        % The properties with default values that should not be exported
+        %   (in .csv format).
     end
     methods (Abstract)
         sameConfig = HasSameConfig(rep, config)
     end
     methods
         function descr = TVDescr(rep)
+            %CONSTRUCTOR From a Rep, instantiates a TVDescr object.
+            %   Keeps a reference to the original Rep in the rep
+            %   property.
             descr = descr@Descr(rep);
         end
         
         function PlotAndYLabel(descr, ax, alone, timeRes)
+            %PLOTANDYLABEL Plots the TVDescr in the specified axes.
+            %   Plots the TVDescr object in the specified axes at the
+            %   specified time resolution. If it is to be plotted alone in
+            %   the figure, an x-label will be added as well.
             valueSize = size(descr.value);
             [tSup, val] = descr.EvalTimeRes(timeRes);
             if any(valueSize == 1)
@@ -57,6 +70,14 @@ classdef (Abstract) TVDescr < Descr
         end
         
         function csvfile = ExportCSVValue(descr, csvfile, directory, csvfileName, valueType, timeRes)
+            %EXPORTCSVVALUE Exports the value of the TVDescr in the
+            %specified .csv file.
+            %   Exports the TVDescr's value in the specified value type
+            %   ('ts' for the time series at the specified time resolution
+            %   and 'stats' for the minimum, maximum, median and
+            %   interquartile range statistics) in the specified .csv file
+            %   with the specified .csv file name in the specified
+            %   directory.
             if strcmp(valueType, 'ts')
                 [tSup, val] = descr.EvalTimeRes(timeRes);
                 if size(val,1) == 1

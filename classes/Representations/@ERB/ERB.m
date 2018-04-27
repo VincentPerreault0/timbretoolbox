@@ -1,45 +1,38 @@
 classdef ERB < TimeFreqDistr
-    % ERB cochleagram representation
+    %ERB Class for Equivalent Rectangular Bandwidth Cochleagram
+    %representation.
+    
     properties (GetAccess = public, SetAccess = protected)
-        sound        % Sound object of which it is a representation
-        
-        method = 'fft'      % 'fft' or 'gammatone'
-        
-        exponent = 1/4 % partial loudness exponent (0.25 from Hartmann97)
-        
-        hopSize
-        hopSize_sec = 0.0058
-        
-        tSupport
-        tSize
-        tSampRate
-        
-        fSupport
-        fSize
-        fSampRate
-        
-        value
+        sound       % SoundFile object of which it is a representation.
+        method = 'fft'  % Method to compute the ERB representation. Can
+                        %   take the values 'fft' or 'gammatone'.
+        exponent = 1/4  % Partial loudness exponent (0.25 from Hartmann97)
+        hopSize     % Hop size of the window (in samples). Determines the 
+                    %   time resolution of the representation.
+        hopSize_sec = 0.0058% Hop size of the window (in seconds). See
+                            %   Peeters (2011) for defaults.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        tSize       % Length of the temporal support vector
+        fSupport    % Frequency support column vector that indicates to
+                    %   what frequencies the bins (lines) of the value
+                    %   refer to (in Hz).
+        fSize       % Length of the frequency support vector
+        value       % Value of the time-frequency distribution (fSize by
+                    %   tSize matrix).
     end
     properties (Access = public)
         descrs % structure containing possible descriptors of this representation
     end
     methods (Access = public)
         function erbRep = ERB(sound, varargin)
-            % INPUTS:
-            % =======
-            % (1) Sound object (mandatory)
-            % (2) configuration structure (optional)
-            % The configuration structure contains the following fields. If any of the
-            % fields are not specified, they are calculated or given default values.
-            % w_Method      -- The method that is used for doing the transformation. It can
-            %                  be one of 'fft' or 'gammatone'.
-            % f_hopSize_sec -- The distance between the centres of two analysis windows in
-            %                  seconds. The default is the number of seconds that would give
-            %                  a distance of 256 samples at 44100 Hz sample rate.
-            % i_hopSize     -- The distance between the centres of two analysis windows in
-            %                  samples.
-            % f_Exp         -- Exponent to obtain loudness from power. See
-            %                  private/ERBspect.m to see more details. Default is 1/4.
+            %CONSTRUCTOR From an audio signal representation, evaluates its
+            %Equivalent Rectangular Bandwidth Cochleagram.
+            %   Evaluates the ERB cochleagram of the audio signal. If the
+            %   method is 'gammatone', the ERB will be computed exactly
+            %   with gammatone filterbanks. If the method is 'fft', the ERB
+            %   will be approximated by a linearly-transformed spectrogram.
+            
             erbRep = erbRep@TimeFreqDistr(sound);
             as = sound.reps.AudioSignal;
             
@@ -63,7 +56,6 @@ classdef ERB < TimeFreqDistr
                 erbRep.hopSize_sec = config.HopSize_sec;
             end
             erbRep.hopSize = round(erbRep.hopSize_sec * as.sampRate);
-            erbRep.tSampRate = as.sampRate / erbRep.hopSize;
             if isfield(config, 'Method')
                 if ~any(strcmp(config.Method, {'fft', 'gammatone'}))
                     error('Config.Method must be a valid method (''fft'' or ''gammatone'').');
@@ -112,8 +104,6 @@ classdef ERB < TimeFreqDistr
             
             erbRep.tSize = length(erbRep.tSupport);
             erbRep.fSize = length(erbRep.fSupport);
-            erbRep.fSampRate = erbRep.fSize / as.sampRate;
-            erbRep.tSampRate = as.sampRate / erbRep.hopSize;
         end
         
         ERBpower(erbRep, signal, wtbar)

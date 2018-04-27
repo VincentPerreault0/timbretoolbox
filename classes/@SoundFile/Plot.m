@@ -1,4 +1,18 @@
 function Plot(sound, varargin)
+%PLOT Plots all evaluated selected representations and descriptors.
+%   In the possibly given configuration structure are specified
+%   representations and their descriptors selected for plotting, possibly
+%   with specified Axes (such as subplot handles) to plot in. If no such
+%   Axes are provided, the descriptors will be plotted in the same figure
+%   as their representation. If no evaluated representations are specified,
+%   all are plotted. If no evaluated descriptors are specified for a
+%   particular representation, all of its evaluated descriptors will be
+%   plotted, unless it has the field 'NoDescr' in which case none of its
+%   descriptors will be plotted. A lower time resolution (in Hz) to plot
+%   the timeseries in can also be given in the configuration structure
+%   under the field 'TimeRes'. Finally, if a directory is provided under
+%   the field 'Directory', the plotted figures will be saved in .png format
+%   in that directory.
 
 if isempty(varargin)
     config = struct();
@@ -67,6 +81,11 @@ end
 end
 
 function [config, directory, timeRes] = GetConfigPlotParams(config)
+%GETCONFIGPLOTPARAMS Gets all specified plotting parameters.
+%   Under the field 'TimeRes', a possible lower time resolution (in Hz) to
+%   plot the timeseries in is retrieved. In the field 'Directory', a
+%   possible directory where the plotted figures could be saved in in .png
+%   format is retrieved.
 
 if isfield(config, 'Directory')
     if ~isdir(config.Directory)
@@ -90,6 +109,17 @@ end
 end
 
 function [config, sz, specifiedAxes] = CheckConfigRepsDescrs(sound, config)
+%CHECKCONFIGREPSDESCRS Makes sure all selected representations and
+%descriptors are valid.
+%   In the possibly given configuration structure are specified
+%   representations and their descriptors selected for plotting, possibly
+%   with specified Axes (such as subplot handles) to plot in. If no such
+%   Axes are provided, the descriptors will be plotted in the same figure
+%   as their representation. If no representations are specified, all are
+%   plotted. If no descriptors are specified for a particular
+%   representation, all of its descriptors will be plotted, unless it has
+%   the field 'NoDescr' in which case none of its descriptors will be
+%   plotted.
 
 sz = struct();
 specifiedAxes = false;
@@ -184,6 +214,10 @@ end
 end
 
 function pltfileName = NewPlotFileName(directory, pltfileName)
+%NEWPLOTFILENAME Finds a new plot figure file name under which to save.
+%   In the directory provided under the field 'Directory', it finds the
+%   greatest current numbered file with the desired pltfileName and gives
+%   out the next numbered plot file name.
 
 filelist = dir(directory);
 count = 0;

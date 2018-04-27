@@ -1,4 +1,25 @@
 function ExportCSV(sound, varargin)
+%EXPORTCSV Exports to .csv all evaluated selected representations and
+%descriptors.
+%   In the possibly given configuration structure are specified
+%   representations and their descriptors selected for exporting. If no
+%   evaluated representations are specified, all are exported. If no
+%   evaluated descriptors are specified for a particular representation,
+%   all of its evaluated descriptors will be exported, unless it has the
+%   field 'NoDescr' in which case none of its descriptors will be exported.
+%   A directory must be provided under the field 'Directory'. It will be
+%   the directory in which the sound will be exported to .csv. A grouping
+%   can also be specified under the field 'Grouping'. It can take values of
+%   'sound', to group all descriptors and representation for a same sound
+%   in a single .csv file, or of 'descr', to group the descriptors of all
+%   the sounds to be evaluated in the same .csv files if they have the same
+%   parameters. Value types can also be specified in the 'ValueTypes' field
+%   of the configuration structure. It must be a cell containing the values
+%   'ts' (for the time series) and/or 'stats' (for the statistics of the
+%   time series such as minimum, maximum, median and interquartile range).
+%   Finally, a lower time resolution (in Hz) to save the time series in can
+%   also be given in the configuration structure under the field 'TimeRes'
+%   (it has no effect on the value type 'stats').
 
 if isempty(varargin)
     config = struct();
@@ -77,6 +98,21 @@ close(wtbar);
 end
 
 function [config, grouping, directory, valueTypes, timeRes] = GetConfigCSVParams(config)
+%GETCONFIGCSVPARAMS Gets all specified exporting parameters.
+%   A directory is retrieved under the field 'Directory'. It will be the
+%   directory in which the sound will be exported to .csv. A specified
+%   grouping can also be retrieved under the field 'Grouping'. It can take
+%   values of 'sound', to group all descriptors and representation for a
+%   same sound in a single .csv file, or of 'descr', to group the
+%   descriptors of all the sounds to be evaluated in the same .csv files if
+%   they have the same parameters. Specified value types can also be
+%   retrieved in the 'ValueTypes' field of the configuration structure. It
+%   must be a cell containing the values 'ts' (for the time series) and/or
+%   'stats' (for the statistics of the time series such as minimum,
+%   maximum, median and interquartile range). Finally, a lower time
+%   resolution (in Hz) to save the time series in can also be retrieved in
+%   the configuration structure under the field 'TimeRes' (it has no effect
+%   on the value type 'stats').
 
 if isfield(config, 'Grouping')
     if ~any(strcmp(config.Grouping, {'sound', 'descr'}))
@@ -118,6 +154,14 @@ end
 end
 
 function [config, sz] = CheckConfigRepsDescrs(sound, config)
+%CHECKCONFIGREPSDESCRS Makes sure all selected representations and
+%descriptors are valid.
+%   In the possibly given configuration structure are specified
+%   representations and their descriptors selected for exporting. If no
+%   evaluated representations are specified, all are exported. If no
+%   evaluated descriptors are specified for a particular representation,
+%   all of its evaluated descriptors will be exported, unless it has the
+%   field 'NoDescr' in which case none of its descriptors will be exported.
 
 sz = 0;
 reps = fieldnames(config);
@@ -173,6 +217,10 @@ end
 end
 
 function csvfileName = NewCSVFileName(directory, csvfileName)
+%NEWCSVFILENAME Finds a new .csv file name under which to export to.
+%   In the directory provided under the field 'Directory', it finds the
+%   greatest current numbered file with the desired csvfileName and gives
+%   out the next numbered plot file name.
 
 filelist = dir(directory);
 count = 0;
@@ -201,6 +249,12 @@ end
 end
 
 function csvfile = GetCSVFileSameConfig(directory, csvfileName, descr)
+%GETCSVFILESAMECONFIG Finds a descriptor .csv file with the same parameter
+%values.
+%   In the directory provided under the field 'Directory', it finds the
+%   file with the desired csvfileName that has the same parameter values as
+%   the descr to export. If none are found, one is created with the
+%   paramter values of the descr to be exported.
 
 filelist = dir(directory);
 count = 0;

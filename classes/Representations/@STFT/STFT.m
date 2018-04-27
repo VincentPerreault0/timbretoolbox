@@ -1,60 +1,71 @@
 classdef STFT < TimeFreqDistr
-    %Short-term Fourier Transform representation
+    %STFT Class for spectrogram representation.
+    
     properties (GetAccess = public, SetAccess = protected)
-        sound        % Sound object of which it is a representation
-        %
-        distrType = 'pow'   % The type of spectrum computed. By default this is "pow" and
-        %                    computes the power spectrum. Other possible values are:
-        %                       "pow"           -- Computes the power spectrum. The
-        %                                          spectrum is divided by two times the
-        %                                          FFT size, the sum of the squared
-        %                                          values of the window and all values
-        %                                          except for the first value are
-        %                                          divided by 2 to remove energy
-        %                                          contributed by the Hilbert transform.
-        %                       "mag"           -- Computes the magnitude spectrum.
-        %                                          Spectrum is scaled as for "pow"
-        %                                          except that it is instread divided by
-        %                                          the sum of the unsquared values of
-        %                                          the window.
-        %                       "complex"       -- Computes the complex spectrum, which
-        %                                          is then scaled the same way as for
-        %                                          "mag".
-        %                       "mag_noscaling" -- Computes the magnitude spectrum
-        %                                          without any of the scaling.
-        winType = 'hamming'% The kind of window used. This can be the name of any
-        %                    function that accepts an integer argument N and returns a
-        %                    vector of length N containing the window.
-        win                 % A vector containing a window. If this is specified,
-        %                    w_WinType will not be used to calculate a window.
-        winSize             % The size of the window in samples.
-        winSize_sec = 0.0232  % see Peeters (2011) for defaults
-        hopSize             % The hop size in samples.
-        hopSize_sec = 0.0058
-        fftSize             % The size of the FFT performed on each frame. This should be
-        %                    greater than or equal to the window size in samples because
-        %                    the STFT algorithm will not window and fold the time-domain
-        %                    signal appropriately if the FFT size is shorter than the
-        %                    window as described in Portnoff (1980).
-        binSize             % If not specified this is the sample rate divided by the FFT
-        %                    size in samples.
-        tSupport
-        tSize
-        tSampRate           % If not specified, this is the sample rate divided by the
-        %                    hop size in samples.
-        fSupport
-        fSize
-        fSampRate           % If not specified this is the reciprocal of the bin size.
-        %
-        ENBW
-        %
-        value
+        sound       % SoundFile object of which it is a representation.
+        distrType = 'pow'   % The type of spectrum computed. By default
+                            %	this is "pow" andcomputes the power
+                            %	spectrum. Other possible values are:
+                            %	- 'pow' : Computes the power spectrum. The
+                            %       spectrum is divided by two times the
+                            %       FFT size, the sum of the squared values
+                            %       of the window and all values except for
+                            %       the first value are divided by 2 to
+                            %       remove energy contributed by the
+                            %       Hilbert transform.
+                            %	- 'mag' : Computes the magnitude spectrum.
+                            %       Spectrum is scaled as for 'pow' except
+                            %       that it is instread divided by the sum
+                            %       of the unsquared values of the window.
+                            %	- 'complex' : Computes the complex
+                            %       spectrum, which is then scaled the same
+                            %       way as for 'mag'.
+                            %	- 'mag_noscaling' : Computes the magnitude
+                            %       spectrum without any of the scaling.
+        hopSize     % Hop size of the window (in samples). Determines the 
+                    %   time resolution of the representation.
+        hopSize_sec = 0.0058% Hop size of the window (in seconds). See
+                            %   Peeters (2011) for defaults.
+        winSize     % Size of the window (in samples). Determines the 
+                    %   frequency resolution of the representation.
+        winSize_sec = 0.0232% Size of the window (in seconds). See Peeters 
+                            %   (2011) for defaults.
+        winType = 'hamming' % The kind of window used. This can be the name
+                            %   of any function that accepts an integer
+                            %   argument N and returns a vector of length N
+                            %   containing a window.
+        win         % A vector containing a window. If this is specified in
+                    %   the configuration structure, the winSize will be
+                    %   updated the winType will become 'custom'.
+        fftSize     % The size of the FFT performed on each frame. This
+                    %   should be greater than or equal to the window size
+                    %   in samples because the STFT algorithm will not
+                    %   window and fold the time-domain signal
+                    %   appropriately if the FFT size is shorter than the
+                    %   window as described in Portnoff (1980).
+        binSize     % If not specified this is the sample rate divided by
+                    %   the FFT size in samples.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        tSize       % Length of the temporal support vector
+        fSupport    % Frequency support column vector that indicates to
+                    %   what frequencies the bins (lines) of the value
+                    %   refer to (in Hz).
+        fSize       % Length of the frequency support vector
+        value       % Value of the time-frequency distribution (fSize by
+                    %   tSize matrix).
     end
     properties (Access = public)
-        descrs % structure containing possible descriptors of this representation
+        descrs      % Structure containing all the representation's 
+                    %   possible descriptors. All fields correspond to a
+                    %   possible descriptor type and are instantiated with
+                    %   a value of 0 (see Rep's getDescrTypes() method).
     end
     methods (Access = public)
         function stftRep = STFT(sound, varargin)
+            %CONSTRUCTOR From an audio signal representation, evaluates its
+            %specrogram.
+            %   Evaluates the spectrogram of the audio signal.
             
             stftRep = stftRep@TimeFreqDistr(sound);
             as = sound.reps.AudioSignal;
@@ -85,7 +96,6 @@ classdef STFT < TimeFreqDistr
                 stftRep.hopSize_sec = config.HopSize_sec;
             end
             stftRep.hopSize = round(stftRep.hopSize_sec * as.sampRate);
-            stftRep.tSampRate = as.sampRate / stftRep.hopSize;
             % If window size in samples specified, calculate the window size in
             % seconds (will overwrite window size in seconds if also specified).
             if isfield(config,'WinSize')
@@ -129,7 +139,6 @@ classdef STFT < TimeFreqDistr
                 stftRep.fftSize = 2^nextpow2(stftRep.winSize);
             end;
             stftRep.binSize	= as.sampRate / stftRep.fftSize;
-            stftRep.fSampRate = 1 / stftRep.binSize;
             
             stftRep.ENBW=sum(stftRep.win.^2)/(sum(stftRep.win).^2)*stftRep.fftSize;
             

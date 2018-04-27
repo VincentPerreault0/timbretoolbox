@@ -1,27 +1,34 @@
 classdef FreqMod < GlobDescr
-    % Frequency modulation of the release phase (as if the sound was a single synthesized note)
+    %FREQMOD Class for frequency modulation of the release phase descriptor
+    %(as if the sound was a single synthesized note).
     
     properties (GetAccess = public, SetAccess = protected)
-        tSupport    % All Descr classes have a temporal support vector that
-        % indicates at what times the data refers to (in
-        % samples).
-        value
-        rep
-        method = 'fft'  % === 'fft' 'hilbert'
+        rep         % Representation object of which it is a descriptor.
+        tSupport    % Temporal range vector (in seconds), of the form
+                    %   [starttime, endtime].
+        value       % Value of the descriptor.
+        method = 'fft'  % Method for the evaluation. It can take values
+                        %   'fft' or 'hilbert'.
     end
     
     properties (Constant)
         repType = 'TEE';
+        % Class of the representation or abstract class of the
+        %   representation type of which it can be a descriptor.
         descrFamilyLeader = '';
+        % Name of the class of the descriptor that evaluates its value. If
+        %   empty, the descriptor evaluates its own value.
         unit = 'Hz'
+        % Unit of the descriptor.
     end
     
     methods
         function freqMod = FreqMod(tee, varargin)
-            % varargin is an (optional) configuration structure containing
-            % the (optional) fields below :
-            % 
-            % Threshold         - See properties
+            %CONSTRUCTOR From the representation, the descriptor is
+            %evaluated.
+            %   Additionally, the AmpMod descriptor is also evaluated and
+            %   created.
+            
             freqMod = freqMod@GlobDescr(tee);
             
             if ~isempty(varargin)
@@ -109,6 +116,9 @@ classdef FreqMod < GlobDescr
         end
         
         function sameConfig = HasSameConfig(descr, config)
+            %HASSAMECONFIG Checks if the descriptor has the same
+            %configuration as the given configuration structure.
+            
             sameConfig = false;
             if isfield(config,'Method')
                 if ~strcmp(descr.method, config.Method)

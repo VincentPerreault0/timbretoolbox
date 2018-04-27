@@ -1,31 +1,38 @@
 classdef AutoCorr < TVDescr
+    %AUTOCORR Class for the autocorrelation descriptor.
     
     properties (GetAccess = public, SetAccess = protected)
-        tSupport    % All Descr classes have a temporal support vector that
-        % indicates at what times the data refers to (in
-        % seconds).
-        value
-        rep
-        nCoeffs = 12;
-        winSize
-        winSize_sec = 0.0232
-        hopSize
-        hopSize_sec = 0.0029
+        rep         % Representation object of which it is a descriptor.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value of the descriptor (nCoeffs by length(tSupport) 
+                    %   matrix).
+        nCoeffs = 12;   % Number of autocorrelation coefficients.
+        hopSize     % Hop size of the window (in samples). Determines the 
+                    %   time resolution of the descriptor.
+        hopSize_sec = 0.0029% Hop size of the window (in seconds). See
+                            %   Peeters (2011) for defaults.
+        winSize     % Size of the window (in samples).
+        winSize_sec = 0.0232% Size of the window (in seconds). See Peeters 
+                            %   (2011) for defaults.
     end
     
     properties (Constant)
         yLabel = 'Autocorrelation';
+        % y-Label of the descriptor when it is plotted.
         repType = 'AudioSignal';
+        % Class of the representation or abstract class of the
+        %   representation type of which it can be a descriptor.
         descrFamilyLeader = '';
+        % Name of the class of the descriptor that evaluates its value. If
+        %   empty, the descriptor evaluates its own value.
     end
     
     methods
         function autoCorr = AutoCorr(as, varargin)
-            % varargin is an (optional) configuration structure containing
-            % the (optional) fields below :
-            % 
-            % NCoeffs   - Specifies the number of autocorrelation
-            %             coefficients to be kept by the algorithm
+            %CONSTRUCTOR From the representation, the descriptor is
+            %evaluated.
+            
             autoCorr = autoCorr@TVDescr(as);
             
             if ~isempty(varargin)
@@ -73,6 +80,9 @@ classdef AutoCorr < TVDescr
         end
         
         function sameConfig = HasSameConfig(descr, config)
+            %HASSAMECONFIG Checks if the descriptor has the same
+            %configuration as the given configuration structure.
+            
             sameConfig = false;
             if isfield(config,'NCoeffs')
                 if descr.nCoeffs ~= config.NCoeffs

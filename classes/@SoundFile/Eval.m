@@ -1,4 +1,14 @@
 function Eval(sound, varargin)
+%EVAL Evaluates all selected representations and descriptors.
+%   In the possibly given configuration structure are specified
+%   representations and their descriptors selected for evaluation, possibly
+%   with specified non-default parameter values. If no representations are
+%   specified, all are evaluated. If no descriptors are specified for a
+%   particular representation, all of its descriptors will be evaluated,
+%   unless it has the field 'NoDescr' in which case none of its descriptors
+%   will be evaluated. Whether it is specified or not, the AudioSignal
+%   representation will be evaluated as it is necessary to the evaluation
+%   of all the other representations.
 
 if isempty(varargin)
     config = struct();
@@ -26,6 +36,10 @@ end
 end
 
 function config = CheckConfigReps(sound, config)
+%CHECKCONFIGREPS Makes sure the selected representations are valid.
+%   If no representations are specified, all are evaluated. Whether it is
+%   specified or not, the AudioSignal representation will be evaluated as
+%   it is necessary to the evaluation of all the other representations.
 
 reps = fieldnames(config);
 noSpecifiedRep = true;
@@ -48,6 +62,14 @@ end
 end
 
 function config = CheckConfigDescrs(sound, config)
+%CHECKCONFIGDESCRS Makes sure the selected descriptors are valid.
+%   If no descriptors are specified for a particular representation, all of
+%   its descriptors will be evaluated, unless it has the field 'NoDescr' in
+%   which case none of its descriptors will be evaluated. If a specified
+%   descriptor isn't its descriptor family leader (i.e. it is evaluated
+%   through the evaluation of another descriptor, its family leader), the
+%   family leader will be specified instead with any parameter values given
+%   for the first non-family leader descriptor.
 
 reps = fieldnames(config);
 for i = 1:length(reps)

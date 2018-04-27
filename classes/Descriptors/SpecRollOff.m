@@ -1,26 +1,31 @@
 classdef SpecRollOff < TVDescr
+    %SPECROLLOFF Class for the spectral rolloff descriptor.
     
     properties (GetAccess = public, SetAccess = protected)
-        tSupport    % All Descr classes have a temporal support vector that
-        % indicates at what times the data refers to (in
-        % samples).
-        value
-        rep
-        threshold = 0.95
+        rep         % Representation object of which it is a descriptor.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value of the descriptor (descriptor dimension
+                    %   by length(tSupport) matrix).
+        threshold = 0.95% Threshold for the evaluation of the descriptor.
     end
     
     properties (Constant)
         yLabel = 'Spectral Rolloff (Hz)';
+        % y-Label of the descriptor when it is plotted.
         repType = 'GenTimeFreqDistr';
+        % Class of the representation or abstract class of the
+        %   representation type of which it can be a descriptor.
         descrFamilyLeader = '';
+        % Name of the class of the descriptor that evaluates its value. If
+        %   empty, the descriptor evaluates its own value.
     end
     
     methods
         function specRollOff = SpecRollOff(gtfDistr, varargin)
-            % varargin is an (optional) configuration structure containing
-            % the (optional) fields below :
-            % 
-            % Threshold
+            %CONSTRUCTOR From the representation, the descriptor is
+            %evaluated.
+            
             specRollOff = specRollOff@TVDescr(gtfDistr);
             if ~isempty(varargin)
                 config = varargin{1};
@@ -57,6 +62,9 @@ classdef SpecRollOff < TVDescr
         end
         
         function sameConfig = HasSameConfig(descr, config)
+            %HASSAMECONFIG Checks if the descriptor has the same
+            %configuration as the given configuration structure.
+            
             sameConfig = false;
             if isfield(config,'Threshold')
                 if descr.threshold ~= config.Threshold

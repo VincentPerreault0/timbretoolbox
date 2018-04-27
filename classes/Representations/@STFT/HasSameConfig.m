@@ -1,4 +1,7 @@
 function sameConfig = HasSameConfig(stftRep, config)
+%HASSAMECONFIG Checks if the STFT representation has the same configuration
+%as the given configuration structure.
+
 sameConfig = false;
 timeRes = 1/stftRep.sound.info.SampleRate;
 if isfield(config,'HopSize')

@@ -1,27 +1,30 @@
 classdef TEE < TimeSignal
-    %Sound wave representation
+    %TEE Class for the Temporal Energy Envelope representation.
+    
     properties (GetAccess = public, SetAccess = protected)
-        tSupport
-        sound        % Sound object of which it is a representation
-        value       %The samples read from the file. If the file comprises many
-        % channels, these are the samples from the first channel.
-        cutoffFreq = 5  % (Hz) Cutoff frequency of the lowpass filter on the energy envelope
+        sound       % SoundFile object of which it is a representation.
+        cutoffFreq = 5  % Cutoff frequency (in Hz) of the lowpass filter on
+                        %   the energy envelope.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value of the Temporal Energy Envelope (line vector of
+                    %   the same length as tSupport).
     end
     properties (Access = public)
-        descrs % structure containing possible descriptors of this representation
+        descrs      % Structure containing all the representation's 
+                    %   possible descriptors. All fields correspond to a
+                    %   possible descriptor type and are instantiated with
+                    %   a value of 0 (see Rep's getDescrTypes() method).
     end
     methods (Access = public)
         function tee = TEE(sound, varargin)
-            % INPUTS:
-            % =======
-            % A sound object
-            %
-            % and (optionally)
-            %
-            % A configuration structure containing the fields
-            %
-            % CutoffFreq        - Specifies a cutoff frequency to be used
-            %                   for the low-pass filter on the energy envelope
+            %CONSTRUCTOR From an audio signal representation, evaluates a
+            %Temporal Energy Envelope representation.
+            %   Evaluates the Temporal Energy Envelope of the audio signal
+            %   by keeping the amplitude of the analytic signal and
+            %   filtering it through a lowpass filter with a specified
+            %   cutoff frequency.
+            
             tee = tee@TimeSignal(sound);
             as = sound.reps.AudioSignal;
             
@@ -50,6 +53,9 @@ classdef TEE < TimeSignal
         end
         
         function sameConfig = HasSameConfig(tee, config)
+            %HASSAMECONFIG Checks if the Temporal Energy Envelope has the
+            %same configuration as the given configuration structure.
+            
             sameConfig = false;
             if isfield(config,'CutoffFreq')
                 if tee.cutoffFreq ~= config.CutoffFreq

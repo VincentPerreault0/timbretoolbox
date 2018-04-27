@@ -1,4 +1,8 @@
 function EvalRep(sound, config)
+%EVALREP Evaluates all selected representations.
+%   In the given configuration structure are specified all selected
+%   representations for evaluation, possibly with specified non-default
+%   parameter values.
 
 wtbar = waitbar(0, 'Reading Audio Signal Representation', 'Name', 'Evaluating Representations...');
 if ~isa(sound.reps.AudioSignal, 'Rep') || ~sound.reps.AudioSignal.HasSameConfig(config.AudioSignal)

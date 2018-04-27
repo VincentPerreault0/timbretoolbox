@@ -1,19 +1,25 @@
 classdef (Abstract) Rep < TimeSeries
-    %REP Summary of this class goes here
-    %   Detailed explanation goes here
+    %REP Abstract class for all representations.
+    %   This class is the parent of all representation types.
     
     properties (Abstract)
-        descrs % Structure of the representation's appropriate descriptors
+        descrs      % Structure containing all the representation's 
+                    %   possible descriptors. All fields correspond to a
+                    %   possible descriptor type and are instantiated with
+                    %   a value of 0 (see Rep's getDescrTypes() method).
     end
     
     properties (Abstract, GetAccess = public, SetAccess = protected)
-        sound % SoundFile object of which it is a representation
-        tSupport
-        value
+        sound       % SoundFile object of which it is a representation.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value of the representation (representation dimension
+                    %   by length(tSupport) matrix).
     end
     
     properties (Abstract, Constant)
-        exceptions
+        exceptions  % The properties with default values that should not be
+                    %    exported (in .csv format).
     end
     
     methods (Abstract)
@@ -26,6 +32,10 @@ classdef (Abstract) Rep < TimeSeries
     
     methods
         function rep = Rep(varargin)
+            %CONSTRUCTOR From a SoundFile, instantiates a Rep object.
+            %   Keeps a reference to the original SoundFile in the sound
+            %   property and instantiates its descrs property.
+            
             if ~isempty(varargin)
                 if ~isa(varargin{1}, 'SoundFile')
                     error('A rep object (representation) must be instantiated from a SoundFile object (sound).');
@@ -34,7 +44,13 @@ classdef (Abstract) Rep < TimeSeries
             end
             rep.getDescrTypes();
         end
+        
         function getDescrTypes(rep)
+            %GETDESCRTYPES Instantiates the rep's descrs property.
+            %   Finds all possible descriptors of the representation and
+            %   adds them as a field with initial value of 0 to the descrs
+            %   structure.
+            
             rep.descrs = struct();
             
             descrsFilepath = mfilename('fullpath');

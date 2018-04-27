@@ -1,30 +1,37 @@
 classdef RMSEnv < TVDescr
+    %RMSENV Class for the RMS-Energy Envelope descriptor.
     
     properties (GetAccess = public, SetAccess = protected)
-        tSupport    % All Descr classes have a temporal support vector that
-        % indicates at what times the data refers to (in
-        % samples).
-        value
-        rep
-        winSize
-        winSize_sec = 0.029
-        hopSize
-        hopSize_sec = 0.232
+        rep         % Representation object of which it is a descriptor.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value of the descriptor (descriptor dimension
+                    %   by length(tSupport) matrix).
+        hopSize     % Hop size of the window (in samples). Determines the 
+                    %   time resolution of the descriptor.
+        hopSize_sec = 0.0029% Hop size of the window (in seconds). See
+                            %   Peeters (2011) for defaults.
+        winSize     % Size of the window (in samples).
+        winSize_sec = 0.0232% Size of the window (in seconds). See Peeters 
+                            %   (2011) for defaults.
     end
     
     properties (Constant)
         yLabel = 'RMS-Energy Envelope';
+        % y-Label of the descriptor when it is plotted.
         repType = 'TEE';
+        % Class of the representation or abstract class of the
+        %   representation type of which it can be a descriptor.
         descrFamilyLeader = '';
+        % Name of the class of the descriptor that evaluates its value. If
+        %   empty, the descriptor evaluates its own value.
     end
     
     methods
         function rmsEnv = RMSEnv(tee, varargin)
-            % varargin is an (optional) configuration structure containing
-            % the (optional) fields below :
-            % 
-            % WinSize_sec       - The window size in seconds
-            % HopSize_sec       - The window hop size in seconds
+            %CONSTRUCTOR From the representation, the descriptor is
+            %evaluated.
+            
             rmsEnv = rmsEnv@TVDescr(tee);
             
             if ~isempty(varargin)
@@ -77,6 +84,9 @@ classdef RMSEnv < TVDescr
         end
         
         function sameConfig = HasSameConfig(descr, config)
+            %HASSAMECONFIG Checks if the descriptor has the same
+            %configuration as the given configuration structure.
+            
             sameConfig = false;
             timeRes = 1/descr.rep.sound.info.SampleRate;
             if isfield(config,'HopSize')

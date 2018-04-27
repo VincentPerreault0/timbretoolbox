@@ -1,8 +1,11 @@
 classdef (Abstract) TTObject < handle
-    % An abstract class for timbretoolbox objects.
+    %TTOBJECT An abstract class for all timbretoolbox objects.
+    %   The purpose of this most abstract class is to estimate the size of
+    %   the matlab objects to be saved (through soundfile.Save(config)).
     
     methods
         function size = GetSize(object)
+            %GETSIZE Estimates the size of the matlab object
             
             metaClass = metaclass(object);
             metaProps = metaClass.PropertyList;

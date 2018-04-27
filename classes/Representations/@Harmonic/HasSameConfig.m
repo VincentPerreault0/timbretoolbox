@@ -1,4 +1,7 @@
 function sameConfig = HasSameConfig(harmRep, config)
+%HASSAMECONFIG Checks if the harmonic representation has the same
+%configuration as the given configuration structure.
+            
 sameConfig = false;
 if isfield(config,'Threshold')
     if harmRep.threshold ~= config.Threshold

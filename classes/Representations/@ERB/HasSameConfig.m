@@ -1,4 +1,7 @@
 function sameConfig = HasSameConfig(erbRep, config)
+%HASSAMECONFIG Checks if the ERB representation has the same configuration
+%as the given configuration structure.
+
 sameConfig = false;
 timeRes = 1/erbRep.sound.info.SampleRate;
 if isfield(config,'HopSize')

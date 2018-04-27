@@ -1,22 +1,48 @@
 classdef SoundFile < TTObject
-    %SOUNDFILE Summary of this class goes here
-    %   Detailed explanation goes here
+    %SOUNDFILE Container object for the sound file and its representations.
+    %   Object that is unique for a sound file and a particular sample
+    %   range for that sound. It also contains all its different evaluated
+    %   representations which, in turn, also contain all their evaluated
+    %   descriptors.
     
     properties (GetAccess = public, SetAccess = private)
-        directory
-        fileName
-        fileType
-        reps                % Structure containing possible representations
+        directory   % Directory where the sound file of interest is
+                    %	located.
+        fileName    % File name of the sound file of interest.
+        fileType    % File format of the sound file of interest.
+        reps        % Structure containing all the sound file's possible 
+                    %   representations. All fields correspond to a
+                    %   possible representation type and are instantiated
+                    %   with a value of 0 (see SoundFile's getRepTypes()
+                    %   method).
         chunkSize = 661500  % Chunk size (in samples) for the evaluation of
-        % its representations and their descriptors. If negative or equal
-        % to 0, the evaluations won't be done by chunks.
+                            %   its representations. If negative or equal
+                            %   to 0, the evaluations will be done in a
+                            %   single chunk.
     end
     properties
-        info = struct()
+        info = struct() % Structure containing information on the sound
+                        %   file, such as (at least) :
+                        %   - TotalSamples : Total number of samples in
+                        %       the file.
+                        %   - SampleRate : Sample rate of the sound file.
+                        %   - NumChannels : Number of channels (mono : 1,
+                        %       stereo : 2).
+                        %   - BitsPerSample : Number of bits per sample
+                        %       in the sound file.
+                        %   - SampleRange : Desired range (in samples) of
+                        %       the sound file to be analyzed, of the form
+                        %       [startsample, endsample].
     end
     
     methods
         function sound = SoundFile(filename, varargin)
+            %CONSTRUCTOR From a file name, instantiates a SoundFile object.
+            %   An additional configuration structure can be passed as an
+            %   argument to specify required parameters for sound file
+            %   formats .raw (FileFormat, NumChannels and SampleRate) or to
+            %   specify additional SoundFile parameters such as a custom
+            %   chunk size or a custom sample range.
             sound.getRepTypes();
             
             if nargin > 1
@@ -25,11 +51,16 @@ classdef SoundFile < TTObject
                 config = struct();
             end
             
-            if ~isa(filename, 'char')
-                error('Sound filename must be a ''char''...');
+            fileInfo = dir(filename);
+            if length(fileInfo) ~= 1
+                error('Sound filename should be a valid file address.');
             end;
             
             [sound.directory, sound.fileName, sound.fileType] = fileparts(filename);
+            
+            if ~any(strcmp(sound.fileType(2:end), {'wav', 'ogg', 'flac', 'au', 'aiff', 'aif', 'aifc', 'mp3', 'm4a', 'mp4', 'raw'}))
+                error('Sound file format should be a valid sound file format.');
+            end
             
             if ~strcmp(sound.fileType, '.raw')
                 sound.info = audioinfo([sound.directory '/' sound.fileName sound.fileType]);
@@ -97,6 +128,10 @@ classdef SoundFile < TTObject
         EvalRep(sound, config)
         
         function getRepTypes(sound)
+            %GETREPTYPES Instantiates the sound's reps property.
+            %   Finds all possible representations of the sound and adds
+            %   them as a field with initial value of 0 to the reps
+            %   structure.
             sound.reps = struct();
             
             repsFilepath = mfilename('fullpath');

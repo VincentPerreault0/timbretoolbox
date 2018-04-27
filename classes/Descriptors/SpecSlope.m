@@ -1,24 +1,30 @@
 classdef SpecSlope < TVDescr
+    %SPECSLOPE Class for the spectral slope descriptor.
     
     properties (GetAccess = public, SetAccess = protected)
-        tSupport    % All Descr classes have a temporal support vector that
-        % indicates at what times the data refers to (in
-        % samples).
-        value
-        rep
+        rep         % Representation object of which it is a descriptor.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value of the descriptor (descriptor dimension
+                    %   by length(tSupport) matrix).
     end
     
     properties (Constant)
         yLabel = 'Spectral Slope (Hz^-1)';
+        % y-Label of the descriptor when it is plotted.
         repType = 'GenTimeFreqDistr';
+        % Class of the representation or abstract class of the
+        %   representation type of which it can be a descriptor.
         descrFamilyLeader = '';
+        % Name of the class of the descriptor that evaluates its value. If
+        %   empty, the descriptor evaluates its own value.
     end
     
     methods
         function specSlope = SpecSlope(gtfDistr, varargin)
-            % varargin is an (optional) configuration structure containing
-            % the (optional) fields below :
-            % 
+            %CONSTRUCTOR From the representation, the descriptor is
+            %evaluated.
+            
             specSlope = specSlope@TVDescr(gtfDistr);
             
             specSlope.tSupport = gtfDistr.tSupport;
@@ -38,6 +44,9 @@ classdef SpecSlope < TVDescr
         end
         
         function sameConfig = HasSameConfig(descr, config)
+            %HASSAMECONFIG Checks if the descriptor has the same
+            %configuration as the given configuration structure.
+            
             sameConfig = true;
         end
     end

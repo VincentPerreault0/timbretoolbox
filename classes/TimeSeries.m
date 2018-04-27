@@ -1,14 +1,17 @@
 classdef (Abstract) TimeSeries < TTObject
-    % An abstract class for descriptors.
+    %TIMESERIES Abstract class containing all vector-valued time series.
+    %   This class is the parent of all representations and descriptors.
     
     properties (Abstract, GetAccess = public, SetAccess = protected)
-        tSupport    % All Descr classes have a temporal support vector that 
-                    % indicates at what times the data refers to (in
-                    % seconds).
-        value
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value matrix of the object (dimension by
+                    %   length(tSupport) matrix), whether it is a
+                    %   representation or a descriptor.
     end
     properties (Abstract, Constant)
-        exceptions
+        exceptions  % The properties with default values that should not be
+                    %    exported (in .csv format).
     end
     
     methods (Abstract)
@@ -19,7 +22,13 @@ classdef (Abstract) TimeSeries < TTObject
     
     methods
         function [tSup, val] = EvalTimeRes(timeSeries, timeRes)
-            if timeRes == 0% || isa(timeSeries, 'AudioSignal')
+            %EVALTIMERES Downsamples the time series at a lower time
+            %resolution.
+            %   Unless the specified time resolution timeRes is 0 or is
+            %   greater than the time series' full time resolution, the
+            %   time series is re-evaluated at the specified time
+            %   resolution.
+            if timeRes == 0
                 tSup = timeSeries.tSupport;
                 val = timeSeries.value;
             else
@@ -44,6 +53,15 @@ classdef (Abstract) TimeSeries < TTObject
         end
         
         function csvfile = ExportCSV(ts, csvfile, directory, csvfileName, valueType, timeRes, header)
+            %EXPORTCSV Exports the time series in the specified .csv file.
+            %   Depending on the header parameter, the name of the class
+            %   could be exported (|header| < 2 & header ~= 0), the
+            %   parameters of the object could be exported (header ~= 0)
+            %   and the time series' value could be exported (header >= 0).
+            %   The value type ('ts' or 'stats') indicates whether the time
+            %   series' value should be exported respectiely as a whole
+            %   (possibly at a lower time resolution) or as statistics
+            %   (minimum, maximum, median and interquartile range).
             if header
                 if abs(header) < 2
                     if isa(ts, 'Rep')

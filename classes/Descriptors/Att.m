@@ -1,29 +1,39 @@
 classdef Att < GlobDescr
-    % Start time of the attack (as if the sound was a single synthesized note)
+    %ATT Class for start time of the attack descriptor (as if the sound was
+    %a single synthesized note).
     
     properties (GetAccess = public, SetAccess = protected)
-        tSupport    % All Descr classes have a temporal support vector that
-        % indicates at what times the data refers to (in
-        % samples).
-        value
-        rep
-        method = 3 % 1 = 0.8*maximum, 2 = maximum, 3 = effort
-        noiseThresh = 0.15
-        decrThresh = 0.4
+        rep         % Representation object of which it is a descriptor.
+        tSupport    % Temporal range vector (in seconds), of the form
+                    %   [starttime, endtime].
+        value       % Value of the descriptor.
+        method = 3	% Method for the start/stop times detection method (1 
+                    %   for 80% of maximum, 2 for maximum and 3 for
+                    %   effort).
+        noiseThresh = 0.15  % Noise threshold (over which the wave form is
+                            %   considered part of the desired signal).
+        decrThresh = 0.4    % Decrease threshold (the noise threshold for
+                            %   the release part).
     end
     
     properties (Constant)
         repType = 'TEE';
+        % Class of the representation or abstract class of the
+        %   representation type of which it can be a descriptor.
         descrFamilyLeader = '';
+        % Name of the class of the descriptor that evaluates its value. If
+        %   empty, the descriptor evaluates its own value.
         unit = 'sec'
+        % Unit of the descriptor.
     end
     
     methods
         function att = Att(tee, varargin)
-            % varargin is an (optional) configuration structure containing
-            % the (optional) fields below :
-            % 
-            % Threshold         - See properties
+            %CONSTRUCTOR From the representation, the descriptor is
+            %evaluated.
+            %   Additionally, the LAT, AttSlope, Dec, Rel and DecSlope
+            %   descriptors are also evaluated and created.
+            
             att = att@GlobDescr(tee);
             
             if ~isempty(varargin)
@@ -180,6 +190,9 @@ classdef Att < GlobDescr
         end
         
         function sameConfig = HasSameConfig(descr, config)
+            %HASSAMECONFIG Checks if the descriptor has the same
+            %configuration as the given configuration structure.
+            
             sameConfig = false;
             if isfield(config,'Method')
                 if descr.method ~= config.Method

@@ -1,50 +1,33 @@
 classdef AudioSignal < TimeSignal
-    %Audio Signal representation
+    %AUDIOSIGNAL Class for the Audio Signal representation.
+    
     properties (GetAccess = public, SetAccess = protected)
-        tSupport
-        sampRate       %Sample rate of audio file.
-        value          %The samples read from the file. If the file comprises many
-        % channels, these are the samples from the first channel.
-        len             %The number of samples read from the file. This will only be
-        % equal to the total number of samples in one channel of the
-        % audiofile if no sample range was specified.
-        sound % reference to its soundfile object
+        sound       % SoundFile object of which it is a representation.
+        tSupport    % Temporal support line vector that indicates at what 
+                    %   times the value columns refer to (in seconds).
+        value       % Value of the AudioSignal (line vector of the same 
+                    %   length as tSupport) : the samples read from the
+                    %   file. If the file comprises many channels, these
+                    %   are the samples from the first channel.
+        len         % The number of samples read from the file. This will
+                    %   only be equal to the total number of samples in one
+                    %   channel of the audiofile if no sample range was
+                    %   specified.
+        sampRate    % Sample rate of the sound file.
+        
     end
     properties (Access = public)
-        descrs % structure containing possible descriptors of this representation (Sound)
+        descrs      % Structure containing all the representation's 
+                    %   possible descriptors. All fields correspond to a
+                    %   possible descriptor type and are instantiated with
+                    %   a value of 0 (see Rep's getDescrTypes() method).
     end
     methods (Access = public)
         function audioSignal = AudioSignal(sound, varargin)
-            % INPUTS:
-            % =======
-            % A string specifying a path to the soundfile
-            %
-            % and (optionally)
-            %
-            % A configuration structure containing the fields
-            % sampRange         - an array of two elements. The first is the
-            %                     index at which to start reading (indexed starting at 1)
-            %                     and the second is the index at which to stop reading. The
-            %                     samples indices are given as if the file only contained
-            %                     one channel. For example, if the file has a sampling rate
-            %                     of 48000 Hz and contains 2 channels and you would like to
-            %                     have the sound from 1 second in for a duration of 1
-            %                     second, you would set this field to the array [1*48000
-            %                     2*48000]. If it is not specified, all of the first channel
-            %                     of the audio file is read.
-            % fileFormat        - (.raw file only) specifies the datatype of one sample.
-            %                     This can be any datatype supported by fread.
-            % nChannels         - (.raw file only) specifies the number of channels.
-            % sampRate          - (.raw file only) Sample rate of audio file.
-            %
-            % It will also contain all of the fields in the configuration structure (if they
-            % weren't specified, they were given a default value) except for: fileFormat,
-            % nChannels and sampRange.
-            %
-            % Copyright (c) 2011 IRCAM/ McGill, All Rights Reserved.
-            % Permission is only granted to use for research purposes
-            %
-            % === Evaluate input args
+            %CONSTRUCTOR From a SoundFile, creates an AudioSignal
+            %representation.
+            %   Reads the audio signal of the given sound file.
+
             audioSignal = audioSignal@TimeSignal(sound);
             
             audioSignal.sampRate = audioSignal.sound.info.SampleRate;
@@ -102,6 +85,9 @@ classdef AudioSignal < TimeSignal
         end
         
         function sameConfig = HasSameConfig(as, config)
+            %HASSAMECONFIG Checks if the audio signal has the same
+            %configuration as the given configuration structure.
+            
             sameConfig = true;
         end
     end
