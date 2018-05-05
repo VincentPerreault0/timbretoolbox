@@ -72,9 +72,19 @@ classdef AudioSignal < TimeSignal
                         waitbar((i-1)/length(rangeStarts), wtbar, ['Chunk ' num2str(i) ' of ' num2str(length(rangeStarts))]);
                     end
                     [signal, ~] = audioread([sound.directory '/' sound.fileName sound.fileType], [rangeStarts(i) min(rangeStarts(i) + chunkSize - 1, audioSignal.sound.info.SampleRange(2))]);
-                    % Only keep the first channel
-                    signal = signal(:,1);
-                    audioSignal.value((rangeStarts(i) - audioSignal.sound.info.SampleRange(1) + 1):min(rangeStarts(i) + chunkSize - audioSignal.sound.info.SampleRange(1), end)) = signal;
+                    if numel(signal) > 0
+                        % Only keep the first channel
+                        signal = signal(:,1);
+                        chunkLength = length(signal);
+                        expectedLength = min(chunkSize, audioSignal.sound.info.SampleRange(2) - rangeStarts(i) + 1);
+                        if chunkLength < expectedLength
+                            warning('Received less samples in chunk than expected. Zero-padded for further processing.');
+                            signal = [signal;zeros(expectedLength - chunkLength,1)];
+                        elseif chunkLength > expectedLength
+                            error('Received more samples in chunk than expected.');
+                        end
+                        audioSignal.value((rangeStarts(i) - audioSignal.sound.info.SampleRange(1) + 1):min(rangeStarts(i) + chunkSize - audioSignal.sound.info.SampleRange(1), end)) = signal;
+                    end
                 end
                 if length(rangeStarts) > 1
                     close(wtbar);

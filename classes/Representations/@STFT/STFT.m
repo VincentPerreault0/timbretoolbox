@@ -140,8 +140,6 @@ classdef STFT < TimeFreqDistr
             end;
             stftRep.binSize	= as.sampRate / stftRep.fftSize;
             
-            stftRep.ENBW=sum(stftRep.win.^2)/(sum(stftRep.win).^2)*stftRep.fftSize;
-            
             stftRep.fSize = stftRep.fftSize/2;
             
             % If the window is centred at t, this is the starting index at which to

@@ -15,7 +15,7 @@ classdef SoundFile < TTObject
                     %   possible representation type and are instantiated
                     %   with a value of 0 (see SoundFile's getRepTypes()
                     %   method).
-        chunkSize = 661500  % Chunk size (in samples) for the evaluation of
+        chunkSize = 30*44100  % Chunk size (in samples) for the evaluation of
                             %   its representations. If negative or equal
                             %   to 0, the evaluations will be done in a
                             %   single chunk.
@@ -108,8 +108,8 @@ classdef SoundFile < TTObject
                 sound.chunkSize = round(config.ChunkSize_bytes / (sound.info.NumChannels * sound.info.BitsPerSample / 8));
             end
             if isfield(config, 'ChunkSize')
-                if ~isa(config.ChunkSize, 'double') || config.ChunkSize <= 0
-                    error('Config.ChunkSize must be a positive number (not equal to 0) of samples to process (approx.) in each chunk.');
+                if ~isa(config.ChunkSize, 'double')
+                    error('Config.ChunkSize must be a positive number of samples to process (approx.) in each chunk. To compute in a single chunk, ChunkSize should be a negative number or 0.');
                 end
                 sound.chunkSize = config.ChunkSize;
             end

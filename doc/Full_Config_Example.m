@@ -69,7 +69,7 @@ pltDirectory = '../Plot Images';
 
 sndConfig = struct();
 % sndConfig.SampRange = [1 inf];
-% sndConfig.ChunkSize = 661500;
+% sndConfig.ChunkSize = 30*44100;
 % sndConfig.FileFormat = 'double';    % needed for .raw files only (e.g. 'example.raw')
 % sndConfig.NumChannels = 1;          % needed for .raw files only (e.g. 'example.raw')
 % sndConfig.SampleRate = 48000;       % needed for .raw files only (e.g. 'example.raw')
