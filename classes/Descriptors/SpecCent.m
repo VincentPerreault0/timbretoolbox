@@ -43,9 +43,9 @@ classdef SpecCent < TVDescr
                 % Spectral spread (variance)
                 specSpread = sum(zeroMeanFSupportDistr.^2 .* distrProb) .^ (1/2);
                 % Spectral skewness (skewness)
-                specSkew = sum(zeroMeanFSupportDistr.^3 .* distrProb) ./ (specSpread .^ 3);
+                specSkew = sum(zeroMeanFSupportDistr.^3 .* distrProb) ./ (specSpread .^ 3 + eps);
                 % Spectral kurtosis (kurtosis)
-                specKurt = sum(zeroMeanFSupportDistr.^4 .* distrProb) ./ (specSpread .^ 4);
+                specKurt = sum(zeroMeanFSupportDistr.^4 .* distrProb) ./ (specSpread .^ 4 + eps);
             else
                 % === Harmonic centroid
                 partialProb = gtfDistr.partialAmps ./ repmat(sum(gtfDistr.partialAmps, 1)+eps, gtfDistr.nHarms,1);	% === divide by zero
@@ -55,9 +55,9 @@ classdef SpecCent < TVDescr
                 % === Harmonic spread
                 specSpread = sqrt(sum(zeroMeanPartialFreqs.^2 .* partialProb, 1));
                 % === Harmonic skew
-                specSkew = sum( zeroMeanPartialFreqs.^3 .* partialProb, 1 ) ./ (specSpread).^3;
+                specSkew = sum( zeroMeanPartialFreqs.^3 .* partialProb, 1 ) ./ (specSpread.^3 + eps);
                 % === Harmonic kurtosis
-                specKurt = sum( zeroMeanPartialFreqs.^4 .* partialProb, 1 ) ./ (specSpread).^4;
+                specKurt = sum( zeroMeanPartialFreqs.^4 .* partialProb, 1 ) ./ (specSpread.^4 + eps);
             end
             gtfDistr.descrs.SpecSpread = SpecSpread(gtfDistr, specCent.tSupport, specSpread);
             gtfDistr.descrs.SpecSkew = SpecSkew(gtfDistr, specCent.tSupport, specSkew);
