@@ -62,7 +62,7 @@ classdef Att < GlobDescr
             att.tSupport = [tee.tSupport(1) tee.tSupport(end)];
             
             [envMax, envMaxIdx] = max(tee.value);
-            normEnergyEnv = tee.value / (envMax); % normalize by maximum value
+            normEnergyEnv = tee.value / (envMax - eps); % normalize by maximum value
             
             % ============================================
             % === calcul de l'index du début d'atteinte de chaque niveau
